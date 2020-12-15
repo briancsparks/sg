@@ -9,7 +9,7 @@ const isNaN = module.exports.isNaN = Number.isNaN || function(value) {
   // NaNs are never equal to themselves, and are the only values that have this weird property
   // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/isNaN
 
-  var n = Number(value);
+  let n = Number(value);
   return n !== n;
 };
 
@@ -233,7 +233,7 @@ var kvSmart = module.exports.kvSmart = function(o, k, v) {
 //-----------------------------------------------------------------------------------------------------------------------------
 module.exports.resolveIt = function(x, args) {
   if (typeof x === 'function') {
-    return x(...argx);
+    return x(...args);
   }
 
   return x;
