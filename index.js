@@ -10,7 +10,8 @@ module.exports = sg.extend(sg,
     require('./keys'),
     require('./misc'),
     require('./ref'),
-    require('./arrays')
+    require('./arrays'),
+    require('./ip')
 );
 
 // TODO: inspect
