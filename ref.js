@@ -1,5 +1,13 @@
 
+const sg                      = require('./extend');
+module.exports = sg.extend(sg,
+  require('./smart'),
+  require('./keys'),
+  require('./reduce'),
+  require('./kv'),
+);
 
+const {isnt, anyIsnt, reduce, kv, numKeys}  = sg;
 
 
 
@@ -7,15 +15,15 @@
 /**
  *  Gets a sub-sub-key.
  */
-var deref = module.exports.deref = function(x, keys_) {
+const deref = module.exports.deref = function(x, keys_) {
   if (isnt(x))      { return; /* undefined */ }
   if (isnt(keys_))  { return; /* undefined */ }
 
-  var keys    = _.isArray(keys_) ? keys_.slice() : keys_.split('.'), key;
-  var result  = x;
+  const keys    = _.isArray(keys_) ? keys_.slice() : keys_.split('.');
+  let   result  = x;
 
   while (keys.length > 0) {
-    key = keys.shift();
+    const key = keys.shift();
     if (!(result = result[key])) {
       // We got a falsy result.  If this was the last item, return it (so, for example
       // we would return a 0 (zero) if looked up.
@@ -31,14 +39,14 @@ var deref = module.exports.deref = function(x, keys_) {
 
 //-----------------------------------------------------------------------------------------------------------------------------
 /**
- *  Sets value on object (this is the workhorse for , setOna.)
+ *  Sets value on object (this is the workhorse for setOn, setOna.)
  *
  *  Returns the sanitized keys, or false.
  */
-var _setOnIt = function(x, keys_, value) {
+const _setOnIt = function(x, keys_, value) {
   if (isnt(x) || isnt(keys_) || isnt(value))  { return false; }
 
-  var keys  = _.isArray(keys_) ? keys_ : keys_.split('.').map(function(x) { return x==='' ? null: x; });
+  const keys  = _.isArray(keys_) ? keys_ : keys_.split('.').map(function(x) { return x==='' ? null: x; });
 
   if (anyIsnt(keys))                          { return false; }
 
@@ -58,11 +66,11 @@ var _setOnIt = function(x, keys_, value) {
  *      // if abc is not set on  options, x.foo.bar.baz does not get set
  *      setOn(x, 'foo.bar.baz', options.abc);
  */
-var setOn = module.exports.setOn = function(x, keys_, value) {
-  var keys = _setOnIt(x, keys_, value);
+/*const setOn =*/ module.exports.setOn = function(x, keys_, value) {
+  const keys = _setOnIt(x, keys_, value);
   if (keys === false)                       { return value; }
 
-  var owner = x, key;
+  let   owner = x, key;
 
   while (keys.length > 1) {
     key = keys.shift();
@@ -91,11 +99,11 @@ var setOn = module.exports.setOn = function(x, keys_, value) {
  *      // if abc is not set on  options, x.foo.bar.baz does not get set
  *      setOn(x, 'foo.bar.baz', options.abc);
  */
-var setOna = module.exports.setOna = function(x, keys_, value) {
-  var keys = _setOnIt(x, keys_, value);
+/*const setOna =*/ module.exports.setOna = function(x, keys_, value) {
+  const keys = _setOnIt(x, keys_, value);
   if (keys === false)                       { return value; }
 
-  var owner = x, key;
+  let   owner = x, key;
 
   while (keys.length > 1) {
     key           = keys.shift();
@@ -123,11 +131,11 @@ var setOna = module.exports.setOna = function(x, keys_, value) {
  * @param {*} all
  * @returns
  */
-module.exports.augmentAllWith = function(aug, all) {
-  if (_.isString(aug))  { return sg.augmentAllWith(all[aug], all); }
+const augmentAllWith = module.exports.augmentAllWith = function(aug, all) {
+  if (_.isString(aug))  { return augmentAllWith(all[aug], all); }
 
-  return sg.reduce(all, {}, function(m, v, k) {
-    return sg.kv(m, k, sg.merge(aug, v));
+  return reduce(all, {}, function(m, v, k) {
+    return kv(m, k, sg.merge(aug, v));
   });
 };
 
@@ -146,23 +154,23 @@ module.exports.augmentAllWith = function(aug, all) {
  * @param {*} obj
  * @returns
  */
-module.exports.choose = function(key, obj) {
+const choose = module.exports.choose = function(key, obj) {
   if (_.isArray(obj)) {
-    return sg.choose(key, sg.augmentAllWith(...obj));
+    return choose(key, augmentAllWith(...obj));
   }
 
-  return sg.deref(obj, key);
+  return deref(obj, key);
 };
 
 //-----------------------------------------------------------------------------------------------------------------------------
 /**
  * Converts to boolean.
  *
- * @param {*} value
+ * @param {*} value_
  * @returns
  */
 module.exports.trueOrFalse = function(value_) {
-  var value = value_;
+  let value = value_;
   if (value === true || value === false)  { return value; }
   if (value === 'true')                   { return true; }
   if (value === 'false')                  { return false; }
@@ -181,11 +189,11 @@ module.exports.tf = module.exports.trueOrFalse;   // alias
  *  * last
  */
 module.exports.each = module.exports._each = function(collection, fn, context) {
-  var numericIndex = 0;
-  var length = collection.length || sg.numKeys(collection);
+  let   numericIndex = 0;
+  const length = collection.length || numKeys(collection);
 
   _.each(collection, function(element, index, coll) {
-    var args = [element, index, {collection: coll, i:numericIndex, first:(numericIndex === 0), last:(numericIndex+1 === length), length:length}];
+    const args = [element, index, {collection: coll, i:numericIndex, first:(numericIndex === 0), last:(numericIndex+1 === length), length:length}];
     numericIndex += 1;
     return fn.apply(this, args);
   }, context);

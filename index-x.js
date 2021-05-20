@@ -1003,132 +1003,132 @@ exports.small = exports.smallItems;
 //   }, context);
 // };
 //
-/**
- * Like _.reduce, but the parameters are in the right places.
- *
- * @param {*} collection
- * @param {*} initial
- * @param {*} fn
- * @returns
- */
-sg.reduce = function(collection, initial, fn) {
-  return _.reduce(collection, fn, initial);
-};
-
-sg.reduceObj = function(obj, initial, fn) {
-  const isObject = sg.isObject(initial);
-
-  return _.reduce(obj, function(m, v, k, ...rest) {
-    const res_ = fn(m, v, k, ...rest);
-
-    // `initial` must be an Object, for any of this to work. If it is not, just act like _.reduce
-    if (!isObject)          { return res_; }
-
-    // They can force the result to be any specific object they want by returning an Object
-    if (sg.isObject(res_))   { return res_; }
-
-    //
-    // This is how the function is intended to be used. The user returns a non-Object, and we
-    // interpert it as follows.
-    //
-    var   res  = res_;
-
-    // They just returned, without returning any data... Just means 'unchanged'
-    if (_.isUndefined(res))   { return m; }
-
-    // Key-Value pair(s) packed in an Array -- The primary way to use this fn
-    if (Array.isArray(res)) {
-
-      if (res.length === 0)     { return m; }   /* unchanged */
-
-      // Re-use key, replace value
-      if (res.length === 1) {
-        res = [k, ...res];
-      }
-
-      // ['key', {value}], ['key', 'value'], ['key', value] -- value can be any type
-      if (res.length === 2 && (_.isString(res[0]) || res[0] === null)) {
-        return {...m, [keyOr(res[0])]: res[1]};
-      }
-
-      // An Array, but not the primary 2-element method; Look at each element in turn
-      return { ...m, ...sg.reduce(res, {}, function(m1, item) {
-
-        // A string Array is a key-mirror
-        // ['a', 'b', 'c'] -> {a:'a', b:'b', c:'c'}
-        if (_.isString(item)) { return {...m1, [item]:item}; }
-
-        if (Array.isArray(item)) {
-
-          // An empty array is just a null-ish item
-          // [[], 'b', 'c'] -> {b:'b', c:'c'}; (Otherwise ['b', 'c'] -> {b:'c'} via the primary method above)
-          if (item.length === 0) {
-            return m1;
-          }
-
-          if (item.length === 1) {
-            item = [k, ...item];
-          }
-
-          if (item.length === 2) {
-            // Just like the primary method, but can have many
-            // ['a', 'b', ['q', {foo:'bar'}]]  -> {a:'a', b:'b',   q:{foo:'bar'}}
-            // ['a', 'b', [null, {foo:'bar'}]] -> {a:'a', b:'b', [k]:{foo:'bar'}}
-            return {...m1, [keyOr(item[0])]: item[1]};
-          }
-
-          // An Array of any other size is: {key: Array}
-
-          // ['a', 'b', ['z', 1,2,3]]  -> {a:'a', b:'b',   z:[1,2,3]}
-          // ['a', 'b', [null, 1,2,3]] -> {a:'a', b:'b', [k]:[1,2,3]}
-          return {...m1, [keyOr(item[0])]: _.rest(item)};
-
-        } else if (sg.isObject(item)) {
-
-          // An Object is just added
-          // ['a', 'b', {foo:42}] -> {a:'a', b:'b', foo:42}
-          return {...m1, ...item};
-        }
-
-        // Not Array or Object
-        return {...m1, [k]:item};
-      })};
-    }
-
-    return {...m, [k]:res};
-
-    function keyOr(x) {
-      if (x === null) {
-        return k;
-      }
-
-      return x;
-    }
-
-  }, initial);
-};
-
-/**
- * Acts just like reduce, but stops calling fn once a single real value is produced.
- *
- * @param {*} collection       - The Object or Array to reduce
- * @param {*} initial          - The initial state of the result
- * @param {*} fn               - The reducer function
- *
- * @returns {*}                - Whatever the reducer function finds
- */
-sg.reduceFirst = function(collection, initial, fn) {
-  var   found = false;
-
-  return sg.reduce(collection, initial, (m, v, k, ...rest) => {
-    if (found)    { return m; }
-
-    const res = fn(m, v, k, ...rest);
-    found     = !sg.isnt(res);
-    return res;
-  });
-};
-
+// /**
+//  * Like _.reduce, but the parameters are in the right places.
+//  *
+//  * @param {*} collection
+//  * @param {*} initial
+//  * @param {*} fn
+//  * @returns
+//  */
+// sg.reduce = function(collection, initial, fn) {
+//   return _.reduce(collection, fn, initial);
+// };
+//
+// sg.reduceObj = function(obj, initial, fn) {
+//   const isObject = sg.isObject(initial);
+//
+//   return _.reduce(obj, function(m, v, k, ...rest) {
+//     const res_ = fn(m, v, k, ...rest);
+//
+//     // `initial` must be an Object, for any of this to work. If it is not, just act like _.reduce
+//     if (!isObject)          { return res_; }
+//
+//     // They can force the result to be any specific object they want by returning an Object
+//     if (sg.isObject(res_))   { return res_; }
+//
+//     //
+//     // This is how the function is intended to be used. The user returns a non-Object, and we
+//     // interpert it as follows.
+//     //
+//     var   res  = res_;
+//
+//     // They just returned, without returning any data... Just means 'unchanged'
+//     if (_.isUndefined(res))   { return m; }
+//
+//     // Key-Value pair(s) packed in an Array -- The primary way to use this fn
+//     if (Array.isArray(res)) {
+//
+//       if (res.length === 0)     { return m; }   /* unchanged */
+//
+//       // Re-use key, replace value
+//       if (res.length === 1) {
+//         res = [k, ...res];
+//       }
+//
+//       // ['key', {value}], ['key', 'value'], ['key', value] -- value can be any type
+//       if (res.length === 2 && (_.isString(res[0]) || res[0] === null)) {
+//         return {...m, [keyOr(res[0])]: res[1]};
+//       }
+//
+//       // An Array, but not the primary 2-element method; Look at each element in turn
+//       return { ...m, ...sg.reduce(res, {}, function(m1, item) {
+//
+//         // A string Array is a key-mirror
+//         // ['a', 'b', 'c'] -> {a:'a', b:'b', c:'c'}
+//         if (_.isString(item)) { return {...m1, [item]:item}; }
+//
+//         if (Array.isArray(item)) {
+//
+//           // An empty array is just a null-ish item
+//           // [[], 'b', 'c'] -> {b:'b', c:'c'}; (Otherwise ['b', 'c'] -> {b:'c'} via the primary method above)
+//           if (item.length === 0) {
+//             return m1;
+//           }
+//
+//           if (item.length === 1) {
+//             item = [k, ...item];
+//           }
+//
+//           if (item.length === 2) {
+//             // Just like the primary method, but can have many
+//             // ['a', 'b', ['q', {foo:'bar'}]]  -> {a:'a', b:'b',   q:{foo:'bar'}}
+//             // ['a', 'b', [null, {foo:'bar'}]] -> {a:'a', b:'b', [k]:{foo:'bar'}}
+//             return {...m1, [keyOr(item[0])]: item[1]};
+//           }
+//
+//           // An Array of any other size is: {key: Array}
+//
+//           // ['a', 'b', ['z', 1,2,3]]  -> {a:'a', b:'b',   z:[1,2,3]}
+//           // ['a', 'b', [null, 1,2,3]] -> {a:'a', b:'b', [k]:[1,2,3]}
+//           return {...m1, [keyOr(item[0])]: _.rest(item)};
+//
+//         } else if (sg.isObject(item)) {
+//
+//           // An Object is just added
+//           // ['a', 'b', {foo:42}] -> {a:'a', b:'b', foo:42}
+//           return {...m1, ...item};
+//         }
+//
+//         // Not Array or Object
+//         return {...m1, [k]:item};
+//       })};
+//     }
+//
+//     return {...m, [k]:res};
+//
+//     function keyOr(x) {
+//       if (x === null) {
+//         return k;
+//       }
+//
+//       return x;
+//     }
+//
+//   }, initial);
+// };
+//
+// /**
+//  * Acts just like reduce, but stops calling fn once a single real value is produced.
+//  *
+//  * @param {*} collection       - The Object or Array to reduce
+//  * @param {*} initial          - The initial state of the result
+//  * @param {*} fn               - The reducer function
+//  *
+//  * @returns {*}                - Whatever the reducer function finds
+//  */
+// sg.reduceFirst = function(collection, initial, fn) {
+//   var   found = false;
+//
+//   return sg.reduce(collection, initial, (m, v, k, ...rest) => {
+//     if (found)    { return m; }
+//
+//     const res = fn(m, v, k, ...rest);
+//     found     = !sg.isnt(res);
+//     return res;
+//   });
+// };
+//
 // /**
 //  * Restore rest().
 //  *
@@ -1195,29 +1195,29 @@ sg.where        = _.filter;
 // sample, object, omit(By), pick(By), sortedIndex, uniq(By),
 
 
-/**
- *  Just like _.extend, but does not mutate the 1st arg.
- */
-sg.extend = function() {
-  var args = sg.reduce(arguments, [], function(m, arg) {
-    return sg.ap(m, arg);
-  });
-
-  args.unshift({});
-  return _.extend.apply(_, args);
-};
-
-/**
- *  Smart sg.extend().
- */
-sg.smartExtend = function() {
-  var args = sg.reduce(arguments, [], function(m, arg) {
-    return sg.ap(m, sg.isObject(arg) ? sg.smartAttrs(arg) : arg);
-  });
-
-  args.unshift({});
-  return _.extend.apply(_, args);
-};
+// /**
+//  *  Just like _.extend, but does not mutate the 1st arg.
+//  */
+// sg.extend = function() {
+//   var args = sg.reduce(arguments, [], function(m, arg) {
+//     return sg.ap(m, arg);
+//   });
+//
+//   args.unshift({});
+//   return _.extend.apply(_, args);
+// };
+//
+// /**
+//  *  Smart sg.extend().
+//  */
+// sg.smartExtend = function() {
+//   var args = sg.reduce(arguments, [], function(m, arg) {
+//     return sg.ap(m, sg.isObject(arg) ? sg.smartAttrs(arg) : arg);
+//   });
+//
+//   args.unshift({});
+//   return _.extend.apply(_, args);
+// };
 //
 // /**
 //  *  Merge objects.
@@ -1264,92 +1264,92 @@ sg.smartExtend = function() {
 //
 //   return result;
 // };
-
-/**
- *  Make sure the item is an array.
- */
-sg.toArray = function(x) {
-  if (x === null || _.isUndefined(x)) { return []; }
-  if (_.isArray(x))                   { return x; }
-  return [x];
-};
-
-sg.safeJSONParse = function(str) {
-  if (str !== '') {
-    try {
-      return JSON.parse(str);
-    } catch(err) {
-//      console.error("Error parsing JSON", str, err);
-    }
-  }
-};
-
-sg.jsonify = function(x) {
-  if (typeof x !== 'string') {
-    return x;
-  }
-
-  return sg.safeJSONParse(x);
-};
-
-/**
- * Make sure x is an Array.
- *
- * @param {*} x                       - The thing to arrayify.
- * @param {Boolean} skipSplitStrings  - Should not split strings
- *
- * @returns {Array}                   - The arrayified x.
- */
-sg.arrayify = function(x, skipSplitStrings) {
-  if (Array.isArray(x)) {
-    return x;
-  }
-  if (!skipSplitStrings && typeof x === 'string') {
-    return x.split(',');
-  }
-  return _.compact([x]);
-};
-
-/**
- * Returns true if the string startsWith any of the strings in the Array.
- *
- * @param {*} str   - The string to test.
- * @param {*} arr   - The list of strings.
- *
- * @returns {boolean} - true if the string starts with any of the items in the `arr`
- */
-sg.startsWithOneOf = function(str, arr) {
-  for (let s of arr) {
-    if (str.startsWith(s)) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-/**
- * Just like filter, but returns both lists [items-that-were-true, items-that-were-false].
- *
- * @param {Array}     arr   - The array to split.
- * @param {function}  cb    - The predicate function.
- *
- * @returns {Array[]}
- */
-sg.splitArray = function(arr, cb) {
-  var a = [],  b = [], len = arr.length;
-
-  for (let i = 0; i < len; ++i) {
-    if (cb(arr[i])) {
-      a.push(arr[i]);
-    } else {
-      b.push(arr[i]);
-    }
-  }
-
-  return [a,b];
-};
-
+//
+// /**
+//  *  Make sure the item is an array.
+//  */
+// sg.toArray = function(x) {
+//   if (x === null || _.isUndefined(x)) { return []; }
+//   if (_.isArray(x))                   { return x; }
+//   return [x];
+// };
+//
+// sg.safeJSONParse = function(str) {
+//   if (str !== '') {
+//     try {
+//       return JSON.parse(str);
+//     } catch(err) {
+// //      console.error("Error parsing JSON", str, err);
+//     }
+//   }
+// };
+//
+// sg.jsonify = function(x) {
+//   if (typeof x !== 'string') {
+//     return x;
+//   }
+//
+//   return sg.safeJSONParse(x);
+// };
+//
+// /**
+//  * Make sure x is an Array.
+//  *
+//  * @param {*} x                       - The thing to arrayify.
+//  * @param {Boolean} skipSplitStrings  - Should not split strings
+//  *
+//  * @returns {Array}                   - The arrayified x.
+//  */
+// sg.arrayify = function(x, skipSplitStrings) {
+//   if (Array.isArray(x)) {
+//     return x;
+//   }
+//   if (!skipSplitStrings && typeof x === 'string') {
+//     return x.split(',');
+//   }
+//   return _.compact([x]);
+// };
+//
+// /**
+//  * Returns true if the string startsWith any of the strings in the Array.
+//  *
+//  * @param {*} str   - The string to test.
+//  * @param {*} arr   - The list of strings.
+//  *
+//  * @returns {boolean} - true if the string starts with any of the items in the `arr`
+//  */
+// sg.startsWithOneOf = function(str, arr) {
+//   for (let s of arr) {
+//     if (str.startsWith(s)) {
+//       return true;
+//     }
+//   }
+//
+//   return false;
+// };
+//
+// /**
+//  * Just like filter, but returns both lists [items-that-were-true, items-that-were-false].
+//  *
+//  * @param {Array}     arr   - The array to split.
+//  * @param {function}  cb    - The predicate function.
+//  *
+//  * @returns {Array[]}
+//  */
+// sg.splitArray = function(arr, cb) {
+//   var a = [],  b = [], len = arr.length;
+//
+//   for (let i = 0; i < len; ++i) {
+//     if (cb(arr[i])) {
+//       a.push(arr[i]);
+//     } else {
+//       b.push(arr[i]);
+//     }
+//   }
+//
+//   return [a,b];
+// };
+//
 
 
 // Export functions

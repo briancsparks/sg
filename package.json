@@ -1,6 +1,6 @@
 {
   "name": "@cdr0/sg",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "All the little functions that make functional Node.JS easier.",
   "main": "index.js",
   "scripts": {
@@ -14,9 +14,9 @@
   "license": "MIT",
   "homepage": "https://github.com/briancsparks/sg",
   "dependencies": {
-    "underscore": "^1.11.0"
+    "underscore": "^1.13.1"
   },
   "devDependencies": {
-    "ava": "^3.13.0"
+    "ava": "^3.15.0"
   }
 }

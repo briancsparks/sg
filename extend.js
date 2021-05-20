@@ -18,15 +18,23 @@ module.exports._extend = function() {
 
 //-----------------------------------------------------------------------------------------------------------------------------
 /**
- *  Smart sg.extend().
+ *  Just like _extend, but smart about the objects.
+ *
+ *  Any items that are not objects are skipped.
+ *  Any attributes of any object that `isnt()` are skipped.
+ *
+ *  Aliased as `smartExtend()`.
  */
 module.exports.extend = function() {
   let args = _.reduce(arguments, function(m, arg) {
     return [...m, isObject(arg) ? smartAttrs(arg) : arg];
   }, [{}]);
 
+  args = _.compact(args);
+
   return _.extend(...args);
 };
+module.exports.smartExtend = module.exports.extend;
 
 
 //-----------------------------------------------------------------------------------------------------------------------------

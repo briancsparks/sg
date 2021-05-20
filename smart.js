@@ -57,7 +57,7 @@ const isObject = module.exports.isObject = function(x) {
 /**
  *
  */
-var isPod = module.exports.isPod = function(x) {
+const isPod = module.exports.isPod = function(x) {
   if (_.isString(x))            { return true; }
   if (_.isNumber(x))            { return true; }
   if (_.isBoolean(x))           { return true; }
@@ -74,7 +74,7 @@ var isPod = module.exports.isPod = function(x) {
  * @param {*} x
  * @returns true or false
  */
-is = module.exports.is = function(x) {
+const is = module.exports.is = function(x) {
   return x || (x===0) || (x==='') || (x===false);
 };
 
