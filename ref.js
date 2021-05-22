@@ -1,13 +1,20 @@
 
-const sg                      = require('./extend');
-module.exports = sg.extend(sg,
-  require('./smart'),
-  require('./keys'),
-  require('./reduce'),
-  require('./kv'),
-);
+// const sg                      = require('./extend');
+// module.exports = sg.extend(sg,
+//   require('./smart'),
+//   require('./keys'),
+//   require('./reduce'),
+//   require('./kv'),
+// );
 
-const {isnt, anyIsnt, reduce, kv, numKeys}  = sg;
+const {_,merge}                       = require('./extend');
+const {
+  isnt,anyIsnt
+}                                     = require('./smart');
+const {
+  reduce
+}                                     = require('./reduce');
+const {kv, numKeys}                   = require('./keys');
 
 
 
@@ -135,7 +142,7 @@ const augmentAllWith = module.exports.augmentAllWith = function(aug, all) {
   if (_.isString(aug))  { return augmentAllWith(all[aug], all); }
 
   return reduce(all, {}, function(m, v, k) {
-    return kv(m, k, sg.merge(aug, v));
+    return kv(m, k, merge(aug, v));
   });
 };
 
