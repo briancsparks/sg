@@ -11,8 +11,23 @@ module.exports = sg.extend(sg,
   require('./objs'),
   require('./keys'),
   require('./misc'),
+  require('./time'),
+  require('./fixed'),
   require('./ref'),
+  require('./http'),
   require('./arrays'),
-  require('./ip')
+  require('./ip'),
 );
+
+require('./is')(sg, module.exports);
+
+
+// TODO: Add HTTP fns
+// TODO: Add flow fns
+
+//     The fullest SG: /cygdrive/d/data/projects/WebStormProjects/bcs/sgX
+//     TODO: Get ARGV fns: argvGet, argvExtract, argvPick from SG.lite.js
+//     TODO: Get sg.ok from SG:flow.js
+
+
 

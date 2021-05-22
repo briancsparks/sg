@@ -1,20 +1,23 @@
 
+// noinspection JSUnfilteredForInLoop
 
+const _   = require('underscore');
+const {isnt}                  = require('./smart');
 
 
 
 // ------------------------------------------------------------------------------------------------------------------------
 module.exports.firstKey = function(obj) {
-  for (var k in obj) {
+  // noinspection LoopStatementThatDoesntLoopJS
+  for (let k in obj) {
     return k;
   }
-  return;
 };
 
 // ------------------------------------------------------------------------------------------------------------------------
 module.exports.numKeys = function(obj) {
-  var num = 0;
-  for (var k in obj) {
+  let num = 0;
+  for (let k in obj) {
     num++;
   }
 
@@ -25,7 +28,7 @@ module.exports.numKeys = function(obj) {
 /**
  *  Build {k:v}
  */
-var kv = module.exports.kv = function(o, k, v) {
+const kv = module.exports.kv = function(o, k, v) {
   if (arguments.length === 2) {
     return kv(null, o, k);
   }
@@ -43,7 +46,7 @@ var kv = module.exports.kv = function(o, k, v) {
 /**
  *  Build {key:k, vName:v}
  */
-var kkvv = module.exports.kkvv = function(o, k, v, vName) {
+const kkvv = module.exports.kkvv = function(o, k, v, vName) {
   if (arguments.length === 2) {
     return kkvv(null, o, k, 'value');
   }
@@ -63,7 +66,7 @@ var kkvv = module.exports.kkvv = function(o, k, v, vName) {
 /**
  *  Build {k:v}, where the key is a dotted-key
  */
-var dottedKv = module.exports.dottedKv = function(o, k, v) {
+const dottedKv = module.exports.dottedKv = function(o, k, v) {
   if (arguments.length === 2) {
 
     if (_.isArray(o)) { return dottedKv(null, o.join('.'), k); }
@@ -91,7 +94,7 @@ var dottedKv = module.exports.dottedKv = function(o, k, v) {
  *
  * @returns {Array}           - The augmented array.
  */
-var ap = module.exports.ap = function(a, v, ...rest) {
+const ap = module.exports.ap = function(a, v, ...rest) {
   if (arguments.length === 1)   { return sg.ap(null, arguments[0]); }
 
   a = a || [];
@@ -117,7 +120,7 @@ var ap = module.exports.ap = function(a, v, ...rest) {
 module.exports.push = function(arr, x) {
   if (_.isUndefined(x))     { return x; }
 
-  var length = arr.length;
+  let length = arr.length;
 
   arr.push(x);
 
@@ -143,7 +146,7 @@ module.exports.keys = function(x) {
  *  Makes an object where the key for each item is the same as the value.
  */
 module.exports.keyMirror = function(x, sep) {
-  var result = {};
+  let result = {};
 
   if (isnt(x))            { return x; }
 

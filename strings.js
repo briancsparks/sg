@@ -122,5 +122,12 @@ module.exports.splitN = function (str, count, sep = '/') {
 };
 
 
+// --------------------------------------------------------------------------------------------------------------------
+module.exports.lastOf = function (str, sep) {
+  const parts = str.split(sep);
+  if (parts.length > 1) {
+    return parts[parts.length - 1];
+  }
+}
 
 
