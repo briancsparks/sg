@@ -1,5 +1,6 @@
 
-
+const {safeJSONParse,safeJSONStringify}   = require('./safe');
+const sg     = require('./extend');
 
 // ------------------------------------------------------------------------------------------------------------------------
 
@@ -97,3 +98,14 @@ module.exports.asObject = function(x, key) {
 };
 var asObject = module.exports.asObject;
 
+
+// ------------------------------------------------------------------------------------------------------------------------
+const deepCopy = module.exports.deepCopy = function (x, ...rest) {
+  let   result = safeJSONParse(safeJSONStringify(x));
+  if (rest.length === 0) {
+    return result;
+  }
+
+  // More to add?
+  return sg._extend(result, deepCopy(...rest));
+};
