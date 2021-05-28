@@ -16,15 +16,13 @@ const sg        = require('./extend');
  *
  * @type {(function(...[*]): (*))|*}
  */
-const inspect = module.exports.inspect = function (...args) {
-  if (args.length === 1) {
-    return inspect('', args[0]);
+const inspect = module.exports.inspect = function (arg0, ...args) {
+  let item = arg0;
+  if (typeof arg0 === 'string') {
+    item = sg.extend({msg: arg0}, ...args);
   }
 
-  const [msg ='', obj ={}] = args;
-  const item = sg.extend({msg}, obj);
-
-  return util.inspect(item, {depth:null, color: true});
+  return util.inspect(item, {depth:null, colors: true});
 };
 
 

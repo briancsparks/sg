@@ -2,7 +2,9 @@
 // noinspection JSUnfilteredForInLoop
 
 const _   = require('underscore');
-const {isnt}                  = require('./smart');
+const {
+  isnt,isObject
+}                     = require('./smart');
 
 
 
@@ -95,7 +97,7 @@ const dottedKv = module.exports.dottedKv = function(o, k, v) {
  * @returns {Array}           - The augmented array.
  */
 const ap = module.exports.ap = function(a, v, ...rest) {
-  if (arguments.length === 1)   { return sg.ap(null, arguments[0]); }
+  if (arguments.length === 1)   { return ap(null, arguments[0]); }
 
   a = a || [];
 
@@ -145,13 +147,13 @@ module.exports.keys = function(x) {
 /**
  *  Makes an object where the key for each item is the same as the value.
  */
-module.exports.keyMirror = function(x, sep) {
+const keyMirror = module.exports.keyMirror = function(x, sep) {
   let result = {};
 
   if (isnt(x))            { return x; }
 
-  if (_.isString(x))      { return sg.keyMirror(x.split(sep || ',')); }
-  if (sg.isObject(x))     { return sg.keyMirror(_.keys(x)); }
+  if (_.isString(x))      { return keyMirror(x.split(sep || ',')); }
+  if (isObject(x))        { return keyMirror(_.keys(x)); }
 
   if (!_.isArray(x))      { return result; }
 
