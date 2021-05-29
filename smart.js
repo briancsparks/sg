@@ -79,6 +79,18 @@ const is = module.exports.is = function(x) {
   return x || (x===0) || (x==='') || (x===false);
 };
 
+// ------------------------------------------------------------------------------------------------------------------------
+/**
+ * Returns true if x isnt, or if it is a collection, if it has no elements.
+ */
+module.exports.isEmpty = function (x) {
+  if (isnt(x)) { return true; }
+  if (Array.isArray(x)) {
+    return x.length > 0;
+  }
+  return Object.keys(x).length > 0;
+};
+
 
 // ------------------------------------------------------------------------------------------------------------------------
 /**
