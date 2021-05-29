@@ -21,6 +21,8 @@ module.exports = sg.extend(sg,
 
 require('./is')(sg, module.exports);
 
+module.exports.qtest = require('./qtest');
+
 
 // TODO: Add HTTP fns
 // TODO: Add flow fns

@@ -1,6 +1,11 @@
 
+const qtest                               = require('./qtest')(module);   /* from within sg */
 const {safeJSONParse,safeJSONStringify}   = require('./safe');
-const sg     = require('./extend');
+const {splitArray}                        = require('./arrays');
+const {keyMirror}                         = require('./keys');
+const {mkPredicate}                       = require('./smart');
+const {reduce}                            = require('./reduce');
+const sg                                  = require('./extend');
 
 // ------------------------------------------------------------------------------------------------------------------------
 
@@ -51,6 +56,59 @@ module.exports.extracts = function(o, ...keys) {
   return result;
 }
 
+// ------------------------------------------------------------------------------------------------------------------------
+const splitObject = module.exports.splitObject = function(obj, ...args) {
+  const cb    = mkPredicate(...args);
+  const arr   = Object.keys(obj);
+
+  const [aKeys, bKeys] = splitArray(arr, function (key) {
+    return cb(key, obj[key], obj);
+  });
+
+  const a = reduce(aKeys, {}, function(m, key) {
+    return {...m, [key]: obj[key]};
+  });
+
+  const b = reduce(bKeys, {}, function(m, key) {
+    return {...m, [key]: obj[key]};
+  });
+
+  return [a,b];
+};
+
+// ----------------------------
+qtest.add('splitObject', function (__, {testAssert2}) {
+  const input = {a:1, b:9, c:42, d: -1};
+  const [a,b]   = splitObject(input, 'a,d');
+
+  testAssert2(a && a.a, 1, `a.a is wrong`);
+  testAssert2(a && a.d, -1, `a.d is wrong`);
+
+  testAssert2(b && b.b, 9, `b.b is wrong`);
+  testAssert2(b && b.c, 42, `b.c is wrong`);
+});
+
+// // ------------------------------------------------------------------------------------------------------------------------
+// function mkPredicate(arg0, ...args) {
+//   if (typeof arg0 === 'function') { return arg0; }
+//
+//   const keys = keyMirror(mkInputStrArray(arg0, ...args));
+//
+//   return function(key, value, o) {
+//     return key in keys;
+//   }
+// }
+//
+// // ------------------------------------------------------------------------------------------------------------------------
+// function mkInputStrArray(arg0, ...args) {
+//   if (!(typeof arg0 !== 'string')) { return; }
+//   if (args.length === 0) {
+//     return arg0.split(',');
+//   }
+//
+//   return [arg0, ...args];
+// }
+//
 // ------------------------------------------------------------------------------------------------------------------------
 /**
  * Returns the object, if it is truly an Object, or `def` otherwise.
@@ -109,3 +167,8 @@ const deepCopy = module.exports.deepCopy = function (x, ...rest) {
   // More to add?
   return sg._extend(result, deepCopy(...rest));
 };
+
+// ----------------------------
+if (require.main === module) {
+  qtest.run();
+}

@@ -1,8 +1,9 @@
 
 const _                       = require('underscore');
+const qtest                   = require('./qtest')(module);
+
 let   isnt;
 let   anyIsnt;
-
 
 //-----------------------------------------------------------------------------------------------------------------------------
 const isNaN = module.exports.isNaN = Number.isNaN || function(value) {
@@ -256,7 +257,56 @@ module.exports.resolveItWithDeref = function(x, args) {
   return result;
 }
 
+// ------------------------------------------------------------------------------------------------------------------------
+const mkInputStrArray = module.exports.mkInputStrArray = function(arg0, ...args) {
+  if (typeof arg0 !== 'string') { return; }
+  if (args.length === 0) {
+    return arg0.split(',');
+  }
 
+  return [arg0, ...args];
+};
+
+// ------------------------------------------------------------------------------------------------------------------------
+const mkPredicate = module.exports.mkPredicate = function(arg0, ...args) {
+  if (typeof arg0 === 'function') { return arg0; }
+
+  // console.log(`mkPred(${[arg0,...args].length})`, mkInputStrArray(arg0, ...args));
+  const keys = keyMirror(mkInputStrArray(arg0, ...args));
+
+  return function(key, value, o) {
+    return key in keys;
+  }
+};
+
+// ----------------------------
+qtest.add('mkPredicate', function (testAssert) {
+  const cb = mkPredicate('a,b');
+
+  testAssert(cb('b'), `cb(b) should be true`);
+  testAssert(!cb('z'), `cb(z) should be false`);
+});
+
+// ----------------------------
+qtest.add('mkPredicate', function (testAssert) {
+  const cb = mkPredicate('a', 'b', 'c');
+
+  testAssert(cb('c'), `cb(c) should be true`);
+  testAssert(!cb('d'), `cb(d) should be false`);
+});
+
+// ------------------------------------------------------------------------------------------------------------------------
+function keyMirror(strings) {
+  return strings.reduce((m, s) => {
+    return {...m, [s]: s};
+  }, {});
+}
+
+
+// ------------------------------------------------------------------------------------------------------------------------
+if (require.main === module) {
+  qtest.run();
+}
 
 
 
